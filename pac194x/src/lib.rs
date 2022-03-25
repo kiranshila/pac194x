@@ -1,6 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 
-mod regs;
+pub mod regs;
 
 use embedded_hal::blocking::i2c;
 use packed_struct::prelude::*;
@@ -55,6 +55,18 @@ macro_rules! read_fn {
             #[doc = stringify!(Reads the $type register and deserializes into the appropriate struct)]
             pub fn [<read_ $var>](&mut self) -> Result<$type, Error<E>> {
                 Ok($type::unpack(&self.block_read($type::addr())?).unwrap())
+            }
+        }
+    };
+}
+
+macro_rules! read_n_fn {
+    ($var:ident, $type:ty) => {
+        paste! {
+            #[doc = stringify!(Reads the $type register and deserializes into the appropriate struct)]
+            pub fn [<read_ $var>](&mut self, n: u8) -> Result<$type, Error<E>> {
+                assert!((1..=4).contains(&n),"Channel n must be between 1 and 4");
+                Ok($type::unpack(&self.block_read_n($type::addr(),n)?).unwrap())
             }
         }
     };
@@ -126,6 +138,15 @@ where
         Ok(buf)
     }
 
+    /// Same behavior as `block_read` but adds the channel offset to the address
+    fn block_read_n<const N: usize>(&mut self, addr: Address, n: u8) -> Result<[u8; N], Error<E>> {
+        let mut buf = [0u8; N];
+        self.i2c
+            .write_read(self.address, &[(addr as u8) + (n - 1)], &mut buf)
+            .map_err(Error::I2c)?;
+        Ok(buf)
+    }
+
     /// Refreshes the device
     ///
     /// The accumulator data, accumulator count, Vbus and Vsense measurements are all refreshed and
@@ -141,8 +162,14 @@ where
         self.send_byte(Address::RefreshV)
     }
 
+    // Auto generated functions for reading and writing all of our registers
     read_write!(ctrl, Ctrl);
     read_write!(acc_count, AccCount);
+    read_n_fn!(vaccn, Vaccn);
+    read_n_fn!(vbusn, Vbusn);
+    read_n_fn!(vsensen, Vsensen);
+    read_n_fn!(vbusn_avg, VbusnAvg);
+    read_n_fn!(vsensen_avg, VsensenAvg);
 }
 
 #[cfg(test)]
