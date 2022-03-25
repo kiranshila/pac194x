@@ -1,0 +1,13 @@
+[package]
+name = "register_derive"
+version = "0.0.1"
+authors = [ "Kiran Shila <me@kiranshila.com>" ]
+edition = "2021"
+
+[lib]
+proc_macro = true
+
+[dependencies]
+syn = { version = "1.0", features = ["full", "extra-traits"] }
+quote = "1.0"
+proc-macro2 = "1.0"
