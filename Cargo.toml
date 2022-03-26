@@ -8,7 +8,7 @@ description = "Platform-agnostic Rust driver for the PAC194x 9V, 16-bit power mo
 keywords = ["no-std", "embedded-hal-driver", "voltage", "power-monitor"]
 categories = ["embedded", "hardware-support", "no-std"]
 repository = "https://github.com/kiranshila/pac194x"
-readme = "../README.md"
+readme = "README.md"
 documentation = "https://docs.rs/crate/pac194x/"
 
 [dependencies]
@@ -20,5 +20,5 @@ version = "0.10"
 default-features = false
 
 [dependencies.register_derive]
-path = "../register_derive"
+path = "register_derive"
 version = "0.0.1"
