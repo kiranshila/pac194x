@@ -1,3 +1,29 @@
+//! A platform-agnostic driver crate for the Microchip PAC194X single/multi channel power monitor using the embedded-hal traits.
+//!
+//! # Usage
+//! 
+//! ```rust
+//! use linux_embedded_hal::I2cdev;
+//! use pac194x::{PAC194X, AddrSelect};
+//! 
+//! const SENSE_RESISTOR: f32 = 0.5;
+//! 
+//! fn main() {
+//!     let i2c = I2cdev::new("/dev/i2c-1").unwrap();
+//!     let mut sensor = PAC194X::new(i2c, AddrSelect::GND).unwrap();
+//!     loop {
+//!         let bus_voltage_1 = sensor.read_bus_voltage_n(1).unwrap();
+//!         let sense_voltage_1 = sensor.read_sense_voltage_n(1).unwrap();
+//!         println!("Channel 1 has a bus voltage of: {:.2} V", bus_voltage_1);
+//!         println!("Channel 1 is pulling a current of: {:.2} A", sense_voltage_1 / SENSE_RESISTOR);
+//!     }
+//! }
+//! ```
+//!
+//! # Reference
+//!
+//!- [Datasheet](https://ww1.microchip.com/downloads/en/DeviceDoc/PAC194X-Data-Sheet-20006543.pdf)
+
 #![cfg_attr(not(test), no_std)]
 
 pub mod regs;
