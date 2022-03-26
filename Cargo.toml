@@ -21,4 +21,7 @@ default-features = false
 
 [dependencies.register_derive]
 path = "register_derive"
-version = "0.0.1"
+version = "0.1.0"
+
+[workspace]
+members = ["register_derive"]
