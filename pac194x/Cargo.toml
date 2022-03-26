@@ -15,5 +15,5 @@ default-features = false
 path = "../register_derive"
 
 [dev-dependencies]
-embedded-hal-mock =  "0.8"
+embedded-hal-mock = "0.8"
 

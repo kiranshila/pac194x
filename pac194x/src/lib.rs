@@ -76,8 +76,9 @@ macro_rules! write_fn {
     ($var:ident,$type:ty) => {
         paste! {
             #[doc = stringify!(Writes out the $type register)]
-            pub fn [<write_ $var>]<const N: usize>(&mut self, $var: $type) -> Result<(), Error<E>> {
-                let mut bytes = [0u8; N];
+            pub fn [<write_ $var>](&mut self, $var: $type) -> Result<(), Error<E>> {
+                const PACKED_SIZE_WITH_ADDR: usize = core::mem::size_of::<<$type as PackedStruct>::ByteArray>() + 1;
+                let mut bytes = [0u8; PACKED_SIZE_WITH_ADDR];
                 bytes[0] = $type::addr() as u8;
                 $var.pack_to_slice(&mut bytes[1..]).unwrap();
                 self.block_write(&bytes)?;
@@ -185,3 +186,4 @@ mod tests {
         assert_eq!(Address::RevisionId as u8, 0xFF);
     }
 }
+
