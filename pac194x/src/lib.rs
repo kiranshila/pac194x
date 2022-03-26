@@ -184,6 +184,10 @@ where
     read_fn!(ctrl_lat: CtrlLat);
     read_write!(neg_pwr_fsr_lat: NegPwrFsrLat);
     read_write!(accum_config: AccumConfig);
+    read_fn!(alert_statuc: AlertStatus);
+    read_write!(slow_alert1: SlowAlert1);
+    read_write!(gpio_alert2: GpioAlert2);
+    read_write!(acc_fullness_limits: AccFullnessLimits);
 }
 
 #[cfg(test)]

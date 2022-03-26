@@ -29,9 +29,9 @@ pub(crate) enum Address {
     CtrlLat,
     NegPwrFsrLat,
     AccumConfig,
-    AlterStatus,
-    SlowAltert1,
-    GpioAltert2,
+    AlertStatus,
+    SlowAlert1,
+    GpioAlert2,
     AccFullnessLimits,
     // Overcurrent Limits
     OcLimitn = 0x30,
@@ -489,6 +489,176 @@ pub struct AccumConfig {
     pub acc3_config: AccumSetting,
     #[packed_field(bits = "1:0", ty = "enum")]
     pub acc4_config: AccumSetting,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "3", bit_numbering = "msb0")]
+/// Read this register to determine the cause of ALERT being tripped.
+/// This register is cleared when read and another conversion cycle completes. If the
+/// condition that set the ALERT is still present when the conversion cycle completes, the bit remains set. The register
+/// does not require a REFRESH to update the readable register value. The OC, UC, OP, OV and UV ALERTs are
+/// disabled by default. To enable the ones you want, set the appropriate bits in [`AlertEnable`].
+pub struct AlertStatus {
+    #[packed_field(bit = "0")]
+    pub ch1_oc: bool,
+    pub ch2_oc: bool,
+    pub ch3_oc: bool,
+    pub ch4_oc: bool,
+    pub ch1_uc: bool,
+    pub ch2_uc: bool,
+    pub ch3_uc: bool,
+    pub ch4_uc: bool,
+    pub ch1_ov: bool,
+    pub ch2_ov: bool,
+    pub ch3_ov: bool,
+    pub ch4_ov: bool,
+    pub ch1_uv: bool,
+    pub ch2_uv: bool,
+    pub ch3_uv: bool,
+    pub ch4_uv: bool,
+    pub ch1_op: bool,
+    pub ch2_op: bool,
+    pub ch3_op: bool,
+    pub ch4_op: bool,
+    /// This bit signals when the accumulator for any channel overflows or exceeds its fullness limit
+    /// specified in [`AccFullnessLimits`]
+    ///
+    /// - false = No accumulated full related ALERT for this channel
+    /// - true = ALERT triggered by accumulator limit
+    pub acc_ovf: bool,
+    /// This bit signals whn the accumulator count overflows or exceeds its fullness limit specified in [`AccFullnessLimits`]
+    ///
+    /// - false = No accumulator full related ALERT for this channl
+    /// - true = ALERT triggered by Accumulator Count fullness limit exceded
+    pub acc_count: bool,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "3", bit_numbering = "msb0")]
+/// Write to this register to assign a specific ALERT signal to the SLOW/ALERT1 pin. The SLOW/ALERT1 pin must be
+/// configured for the ALERT function in [`Ctrl`] for this register to control the pin.
+/// ALERTs must be enabled in [`AlertEnable`] before you can route them to a pin. Disable ALERTs in
+/// [`AlertEnable`] before changing any limit to avoid false triggers.
+pub struct SlowAlert1 {
+    #[packed_field(bit = "0")]
+    pub ch1_oc: bool,
+    pub ch2_oc: bool,
+    pub ch3_oc: bool,
+    pub ch4_oc: bool,
+    pub ch1_uc: bool,
+    pub ch2_uc: bool,
+    pub ch3_uc: bool,
+    pub ch4_uc: bool,
+    pub ch1_ov: bool,
+    pub ch2_ov: bool,
+    pub ch3_ov: bool,
+    pub ch4_ov: bool,
+    pub ch1_uv: bool,
+    pub ch2_uv: bool,
+    pub ch3_uv: bool,
+    pub ch4_uv: bool,
+    pub ch1_op: bool,
+    pub ch2_op: bool,
+    pub ch3_op: bool,
+    pub ch4_op: bool,
+    /// This bit signals when the accumulator for any channel overflows or exceeds its fullness limit
+    /// specified in [`AccFullnessLimits`]
+    ///
+    /// - false = No accumulated full related ALERT for this channel
+    /// - true = ALERT triggered by accumulator limit
+    pub acc_ovf: bool,
+    /// This bit signals whn the accumulator count overflows or exceeds its fullness limit specified in [`AccFullnessLimits`]
+    ///
+    /// - false = No accumulator full related ALERT for this channl
+    /// - true = ALERT triggered by Accumulator Count fullness limit exceded
+    pub acc_count: bool,
+    /// Setting this bit to ‘1’ causes the SLOW/ALERT1 pin to be asserted for 5 μs at the end
+    /// of each conversion cycle. This pin must be configured as an ALERT pin for this function to trigger the
+    /// SLOW/ALERT1 pin. The SLOW function is not available on this pin when the pin is used as an ALERT
+    /// pin.
+    ///
+    /// - false = No ALERT on SLOW/ALERT1 pin at each conversion cycle complete event
+    /// - true = ALERT function on SLOW/ALERT1 pin asserted for 5 μs on each completion of the conversion cycle
+    pub alert_cc1: bool,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "3", bit_numbering = "msb0")]
+/// Write to this register to assign a specific ALERT signal to the GPIO/ALERT2 pin. The GPIO/ALERT2 pin must be
+/// configured for the ALERT function in [`Ctrl`] for this register to control the pin.
+/// ALERTs must be enabled in [`AlertEnable`] before you can route them to a pin. Disable ALERTs in
+/// [`AlertEnable`] before changing any limit to avoid false triggers.
+pub struct GpioAlert2 {
+    #[packed_field(bit = "0")]
+    pub ch1_oc: bool,
+    pub ch2_oc: bool,
+    pub ch3_oc: bool,
+    pub ch4_oc: bool,
+    pub ch1_uc: bool,
+    pub ch2_uc: bool,
+    pub ch3_uc: bool,
+    pub ch4_uc: bool,
+    pub ch1_ov: bool,
+    pub ch2_ov: bool,
+    pub ch3_ov: bool,
+    pub ch4_ov: bool,
+    pub ch1_uv: bool,
+    pub ch2_uv: bool,
+    pub ch3_uv: bool,
+    pub ch4_uv: bool,
+    pub ch1_op: bool,
+    pub ch2_op: bool,
+    pub ch3_op: bool,
+    pub ch4_op: bool,
+    /// This bit signals when the accumulator for any channel overflows or exceeds its fullness limit
+    /// specified in [`AccFullnessLimits`]
+    ///
+    /// - false = No accumulated full related ALERT for this channel
+    /// - true = ALERT triggered by accumulator limit
+    pub acc_ovf: bool,
+    /// This bit signals whn the accumulator count overflows or exceeds its fullness limit specified in [`AccFullnessLimits`]
+    ///
+    /// - false = No accumulator full related ALERT for this channel
+    /// - true = ALERT triggered by Accumulator Count fullness limit exceeded
+    pub acc_count: bool,
+    /// Setting this bit to ‘1’ causes the GPIO/ALERT2 pin to be asserted for 5 μs at the end
+    /// of each conversion cycle. This pin must be configured as an ALERT pin for this function to trigger the
+    /// GPIO/ALERT2 pin. The SLOW function is not available on this pin when the pin is used as an ALERT
+    /// pin.
+    ///
+    /// - false = No ALERT on GPIO/ALERT2 pin at each conversion cycle complete event
+    /// - true = ALERT function on GPIO/ALERT2 pin asserted for 5 μs on each completion of the conversion cycle
+    pub alert_cc2: bool,
+}
+
+#[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
+pub enum AccFullness {
+    Full = 0,
+    /// 15/16 Full (Default)
+    Mostly = 1,
+    /// 7/8 Full
+    Somewhat = 2,
+    /// 3/4 Full
+    Partially = 3,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
+/// These limits are used to set a limit for how full the Accumulators and Accumulator Count registers can be before the
+/// Accumulator Full and Accumulator Count full limits are tripped. This allows an ALERT to be registered when the
+/// Accumulator and Accumulator Count are approaching 100% full. Disable ALERTs in Register 7-34 before changing
+/// the value to avoid false triggers.
+pub struct AccFullnessLimits {
+    #[packed_field(bits = "15:14", ty = "enum")]
+    pub ch1_acc_full: AccFullness,
+    #[packed_field(bits = "13:12", ty = "enum")]
+    pub ch2_acc_full: AccFullness,
+    #[packed_field(bits = "11:10", ty = "enum")]
+    pub ch3_acc_full: AccFullness,
+    #[packed_field(bits = "9:8", ty = "enum")]
+    pub ch4_acc_full: AccFullness,
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub acc_count_full: AccFullness,
 }
 
 #[cfg(test)]
