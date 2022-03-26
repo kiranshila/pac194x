@@ -2,6 +2,14 @@
 name = "pac194x"
 version = "0.1.0"
 edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Kiran Shila <me@kiranshila.com>"]
+description = "Platform-agnostic Rust driver for the PAC194x 9V, 16-bit power monitor with alerts"
+keywords = ["no-std", "embedded-hal-driver", "voltage", "power-monitor"]
+categories = ["embedded", "hardware-support", "no-std"]
+repository = "https://github.com/kiranshila/pac194x"
+readme = "../README.md"
+documentation = "https://docs.rs/crate/pac194x/"
 
 [dependencies]
 embedded-hal = "0.2"
@@ -13,7 +21,4 @@ default-features = false
 
 [dependencies.register_derive]
 path = "../register_derive"
-
-[dev-dependencies]
-embedded-hal-mock = "0.8"
-
+version = "0.0.1"
