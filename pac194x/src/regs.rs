@@ -43,7 +43,7 @@ pub(crate) enum Address {
     OvLimitn = 0x3C,
     // Undervoltage Limits
     UvLimitn = 0x40,
-    // Limit Altert Thresholds
+    // Limit Alert Thresholds
     OcLimitNSamples = 0x44,
     UcLimitNSamples,
     OpLimitNSamples,
@@ -659,6 +659,218 @@ pub struct AccFullnessLimits {
     pub ch4_acc_full: AccFullness,
     #[packed_field(bits = "7:6", ty = "enum")]
     pub acc_count_full: AccFullness,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
+/// Overcurrent (OC) limit for each channel. This limit is a two’s complement number for
+/// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
+/// channel has its own limit and addressable register.
+pub struct OcLimitn {
+    #[packed_field(bits = "15:0", endian = "lsb")]
+    pub limit: i16,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
+/// Undercurrent (UC) limit for each channel. This limit is a two’s complement number for
+/// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
+/// channel has its own limit and addressable register.
+pub struct UcLimitn {
+    #[packed_field(bits = "15:0", endian = "lsb")]
+    pub limit: i16,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "3", bit_numbering = "lsb0")]
+/// Overpower (OP) limit for each channel. This limit is a two’s complement number for
+/// all modes. These 24 bits correspond to the upper 24 MSBs in the VPOWER number. The OP limit (only)
+/// is magnitude based, an OP trigger occurs when the result is more positive or more negative than the
+/// limit. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each channel
+/// has its own limit and addressable register.
+pub struct OpLimitn {
+    #[packed_field(bits = "23:0", endian = "lsb")]
+    pub limit: i32,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
+/// Overvoltage (OV) limit for each channel. This limit is a two’s complement number for
+/// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
+/// channel has its own limit and addressable register.
+pub struct OvLimitn {
+    #[packed_field(bits = "15:0", endian = "lsb")]
+    pub limit: i16,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
+/// Undervoltage (UV) limit for each channel. This limit is a two’s complement number for
+/// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
+/// channel has its own limit and addressable register.
+pub struct UvLimitn {
+    #[packed_field(bits = "15:0", endian = "lsb")]
+    pub limit: i16,
+}
+
+/// The consecutive sample count to trigger an alert
+#[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
+pub enum SampleCount {
+    /// Default
+    _1 = 0,
+    _4 = 1,
+    _8 = 2,
+    _16 = 3,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "1", bit_numbering = "lsb0")]
+/// Number of consecutive samples exceeding the overcurrent limit that are required to trigger the ALERT function for
+/// each channel. The default is 1 sample [`SampleCount::_1`]. The sample counter is not reset until a conversion is completed to con-
+/// firm that the ALERT condition is no longer present. A single conversion immediately after the ALERT is cleared will
+/// reset the ALERT. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers.
+pub struct OcLimitNSamples {
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub n_samples_ch1: SampleCount,
+    #[packed_field(bits = "5:4", ty = "enum")]
+    pub n_samples_ch2: SampleCount,
+    #[packed_field(bits = "3:2", ty = "enum")]
+    pub n_samples_ch3: SampleCount,
+    #[packed_field(bits = "1:0", ty = "enum")]
+    pub n_samples_ch4: SampleCount,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "1", bit_numbering = "lsb0")]
+/// Number of consecutive samples exceeding the undercurrent limit that are required to trigger the ALERT function for
+/// each channel. The default is 1 sample [`SampleCount::_1`].
+/// Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers.
+pub struct UcLimitNSamples {
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub n_samples_ch1: SampleCount,
+    #[packed_field(bits = "5:4", ty = "enum")]
+    pub n_samples_ch2: SampleCount,
+    #[packed_field(bits = "3:2", ty = "enum")]
+    pub n_samples_ch3: SampleCount,
+    #[packed_field(bits = "1:0", ty = "enum")]
+    pub n_samples_ch4: SampleCount,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "1", bit_numbering = "lsb0")]
+/// Number of consecutive samples exceeding the overpower limit that are required to trigger the ALERT function for
+/// each channel. The default is 1 sample [`SampleCount::_1`].
+/// Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers.
+pub struct OpLimitNSamples {
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub n_samples_ch1: SampleCount,
+    #[packed_field(bits = "5:4", ty = "enum")]
+    pub n_samples_ch2: SampleCount,
+    #[packed_field(bits = "3:2", ty = "enum")]
+    pub n_samples_ch3: SampleCount,
+    #[packed_field(bits = "1:0", ty = "enum")]
+    pub n_samples_ch4: SampleCount,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "1", bit_numbering = "lsb0")]
+/// Number of consecutive samples exceeding the overvoltage limit that are required to trigger the ALERT function for
+/// each channel. The default is 1 sample [`SampleCount::_1`].
+/// Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers.
+pub struct OvLimitNSamples {
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub n_samples_ch1: SampleCount,
+    #[packed_field(bits = "5:4", ty = "enum")]
+    pub n_samples_ch2: SampleCount,
+    #[packed_field(bits = "3:2", ty = "enum")]
+    pub n_samples_ch3: SampleCount,
+    #[packed_field(bits = "1:0", ty = "enum")]
+    pub n_samples_ch4: SampleCount,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "1", bit_numbering = "lsb0")]
+/// Number of consecutive samples exceeding the undervoltage limit that are required to trigger the ALERT function for
+/// each channel. The default is 1 sample [`SampleCount::_1`].
+/// Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers.
+pub struct UvLimitNSamples {
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub n_samples_ch1: SampleCount,
+    #[packed_field(bits = "5:4", ty = "enum")]
+    pub n_samples_ch2: SampleCount,
+    #[packed_field(bits = "3:2", ty = "enum")]
+    pub n_samples_ch3: SampleCount,
+    #[packed_field(bits = "1:0", ty = "enum")]
+    pub n_samples_ch4: SampleCount,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "3", bit_numbering = "msb0")]
+/// Write to these bits to enable ALERT functions.
+/// To enable OC, UC, OP, OV, UV ALERTs, write ‘1’ to the appropriate bit. ALERTs must be enabled in this reg-
+/// ALERTs must be enabled in this register before they can be routed to an ALERT pin.
+/// A REFRESH (or REFRESH_V/G) is required to activate the enabled ALERTs.
+pub struct AlertEnable {
+    #[packed_field(bit = "0")]
+    pub ch1_oc: bool,
+    pub ch2_oc: bool,
+    pub ch3_oc: bool,
+    pub ch4_oc: bool,
+    pub ch1_uc: bool,
+    pub ch2_uc: bool,
+    pub ch3_uc: bool,
+    pub ch4_uc: bool,
+    pub ch1_ov: bool,
+    pub ch2_ov: bool,
+    pub ch3_ov: bool,
+    pub ch4_ov: bool,
+    pub ch1_uv: bool,
+    pub ch2_uv: bool,
+    pub ch3_uv: bool,
+    pub ch4_uv: bool,
+    pub ch1_op: bool,
+    pub ch2_op: bool,
+    pub ch3_op: bool,
+    pub ch4_op: bool,
+    pub acc_ovf: bool,
+    pub acc_count: bool,
+    pub alert_cc: bool,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "1", bit_numbering = "lsb0")]
+/// This register contains an image of [`AccumConfig`] and reflects the current active values of these settings, whereas the
+/// values in register 25h may be programmed but not activated by one of the REFRESH commands. This register
+/// allows software to determine the actual active settings.
+pub struct AccumConfigAct {
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub acc1_config: AccumSetting,
+    #[packed_field(bits = "5:4", ty = "enum")]
+    pub acc2_config: AccumSetting,
+    #[packed_field(bits = "3:2", ty = "enum")]
+    pub acc3_config: AccumSetting,
+    #[packed_field(bits = "1:0", ty = "enum")]
+    pub acc4_config: AccumSetting,
+}
+
+#[derive(PackedStruct, Debug, PartialEq, Register)]
+#[packed_struct(size_bytes = "1", bit_numbering = "lsb0")]
+/// This register contains an image of [`AccumConfig`]
+/// The bits in this register reflect the value of these settings that were
+/// active before the most recent REFRESH command (including REFRESH_V and/of REFRESH_G). The values in
+/// register 25h may be programmed but not activated by one of the REFRESH commands and the values in register
+/// 4Ah are currently active. This register allows software to determine the actual setting that was active prior to the most
+/// recent REFRESH command and, therefore, corresponds to the dataset that is held in the readable registers. This
+/// register is valid when the results registers are valid, 1 ms after a REFRESH/_V/_G command
+pub struct AccumConfigLat {
+    #[packed_field(bits = "7:6", ty = "enum")]
+    pub acc1_config: AccumSetting,
+    #[packed_field(bits = "5:4", ty = "enum")]
+    pub acc2_config: AccumSetting,
+    #[packed_field(bits = "3:2", ty = "enum")]
+    pub acc3_config: AccumSetting,
+    #[packed_field(bits = "1:0", ty = "enum")]
+    pub acc4_config: AccumSetting,
 }
 
 #[cfg(test)]

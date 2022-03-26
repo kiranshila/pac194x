@@ -31,6 +31,16 @@ pub enum AddrSelect {
     VDD = 0b11111,
 }
 
+/// The Product ID of the connected part
+pub enum ProductId {
+    PAC1941_1,
+    PAC1942_1,
+    PAC1943_1,
+    PAC1944_1,
+    PAC1941_2,
+    PAC1942_2,
+}
+
 /// A PAC194X power monitor on the I2C bus `I`.
 pub struct PAC194X<I>
 where
@@ -88,10 +98,34 @@ macro_rules! write_fn {
     };
 }
 
+macro_rules! write_n_fn {
+    ($var:ident: $type:ty) => {
+        paste! {
+            #[doc = stringify!(Writes out the $type register)]
+            pub fn [<write_ $var>](&mut self, $var: $type, n: u8) -> Result<(), Error<E>> {
+                assert!((1..=4).contains(&n),"Channel n must be between 1 and 4");
+                const PACKED_SIZE_WITH_ADDR: usize = core::mem::size_of::<<$type as PackedStruct>::ByteArray>() + 1;
+                let mut bytes = [0u8; PACKED_SIZE_WITH_ADDR];
+                bytes[0] = ($type::addr() as u8) + n - 1;
+                $var.pack_to_slice(&mut bytes[1..]).unwrap();
+                self.block_write(&bytes)?;
+                Ok(())
+            }
+        }
+    };
+}
+
 macro_rules! read_write {
     ($var:ident: $type:ty) => {
         write_fn!($var: $type);
         read_fn!($var: $type);
+    };
+}
+
+macro_rules! read_write_n {
+    ($var:ident: $type:ty) => {
+        write_n_fn!($var: $type);
+        read_n_fn!($var: $type);
     };
 }
 
@@ -167,6 +201,43 @@ where
         self.send_byte(Address::RefreshV)
     }
 
+    /// Refreshes every PAC194X device on the bus by transmitting REFRESH_G to the
+    /// general call address of 0
+    pub fn regresh_g(&mut self) -> Result<(), Error<E>> {
+        self.i2c
+            .write(0u8, &[Address::RefreshG as u8])
+            .map_err(Error::I2c)?;
+        Ok(())
+    }
+
+    /// Retrieves the Product ID of the connected component
+    pub fn product_id(&mut self) -> Result<ProductId, Error<E>> {
+        self.send_byte(regs::Address::ProductId)?;
+        Ok(match self.receive_byte()? {
+            0b0110_1000 => ProductId::PAC1941_1,
+            0b0110_1001 => ProductId::PAC1942_1,
+            0b0110_1010 => ProductId::PAC1943_1,
+            0b0110_1011 => ProductId::PAC1944_1,
+            0b0110_1100 => ProductId::PAC1941_2,
+            0b0110_1101 => ProductId::PAC1942_2,
+            _ => unreachable!(),
+        })
+    }
+
+    /// The Manufacturer ID register identifies Microchip as the manufacturer of the PAC194X.
+    /// This should return 0x54
+    pub fn manufacturer_id(&mut self) -> Result<u8, Error<E>> {
+        self.send_byte(regs::Address::ManufacturerId)?;
+        self.receive_byte()
+    }
+
+    /// The Revision register identifies the die revision.
+    /// This should return 0b00000010
+    pub fn revision_id(&mut self) -> Result<u8, Error<E>> {
+        self.send_byte(regs::Address::RevisionId)?;
+        self.receive_byte()
+    }
+
     // Auto generated functions for reading and writing all of our registers
     read_write!(ctrl: Ctrl);
     read_write!(acc_count: AccCount);
@@ -188,6 +259,19 @@ where
     read_write!(slow_alert1: SlowAlert1);
     read_write!(gpio_alert2: GpioAlert2);
     read_write!(acc_fullness_limits: AccFullnessLimits);
+    read_write_n!(oc_limitn: OcLimitn);
+    read_write_n!(uc_limitn: UcLimitn);
+    read_write_n!(op_limitn: OpLimitn);
+    read_write_n!(ov_limitn: OvLimitn);
+    read_write_n!(uv_limitn: UvLimitn);
+    read_write!(oc_limit_n_samples: OcLimitNSamples);
+    read_write!(uc_limit_n_samples: UcLimitNSamples);
+    read_write!(op_limit_n_samples: OpLimitNSamples);
+    read_write!(ov_limit_n_samples: OvLimitNSamples);
+    read_write!(uv_limit_n_samples: UvLimitNSamples);
+    read_write!(alert_enable: AlertEnable);
+    read_write!(accum_config_act: AccumConfigAct);
+    read_write!(accum_config_lat: AccumConfigLat);
 }
 
 #[cfg(test)]
