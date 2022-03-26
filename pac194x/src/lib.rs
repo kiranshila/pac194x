@@ -34,7 +34,7 @@ pub enum AddrSelect {
 /// A PAC194X power monitor on the I2C bus `I`.
 pub struct PAC194X<I>
 where
-    I: i2c::Read + i2c::Write,
+    I: i2c::Read + i2c::Write + i2c::WriteRead,
 {
     i2c: I,
     address: u8,
@@ -76,8 +76,12 @@ macro_rules! write_fn {
     ($var:ident,$type:ty) => {
         paste! {
             #[doc = stringify!(Writes out the $type register)]
-            pub fn [<write_ $var>](&mut self, $var: $type) -> Result<(), Error<E>> {
-                self.block_write($type::addr(),&$var.pack().unwrap())
+            pub fn [<write_ $var>]<const N: usize>(&mut self, $var: $type) -> Result<(), Error<E>> {
+                let mut bytes = [0u8; N];
+                bytes[0] = $type::addr() as u8;
+                $var.pack_to_slice(&mut bytes[1..]).unwrap();
+                self.block_write(&bytes)?;
+                Ok(())
             }
         }
     };
@@ -123,7 +127,7 @@ where
 
     /// Block write is used to write multiple data bytes from a register that contains more than one byte of data
     /// of from a group of contiguous registers
-    fn block_write(&mut self, addr: Address, bytes: &[u8]) -> Result<(), Error<E>> {
+    fn block_write(&mut self, bytes: &[u8]) -> Result<(), Error<E>> {
         self.i2c.write(self.address, bytes).map_err(Error::I2c)?;
         Ok(())
     }
