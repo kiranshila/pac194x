@@ -3,6 +3,9 @@ name = "register_derive"
 version = "0.1.0"
 authors = [ "Kiran Shila <me@kiranshila.com>" ]
 edition = "2021"
+repository = "https://github.com/kiranshila/pac194x"
+readme = "README.md"
+documentation = "https://docs.rs/crate/pac194x/"
 
 [lib]
 proc_macro = true
