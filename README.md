@@ -2,6 +2,10 @@
 
 A platform-agnostic driver crate for the Microchip [PAC194X](https://ww1.microchip.com/downloads/en/DeviceDoc/PAC194X-Data-Sheet-20006543.pdf) single/multi channel power monitor using the embedded-hal traits.
 
+[![Build Status](https://github.com/kiranshila/pac194x/workflows/Main/badge.svg)](https://github.com/kiranshila/pac194x/actions)
+[![Docs.rs](https://docs.rs/pac194x/badge.svg)](https://docs.rs/pac194x)
+[![Crates.io](https://img.shields.io/crates/v/pac194x)](https://crates.io/crates/pac194x)
+
 This driver allows you to:
 - Read/Write every available register as a Rust data structure, allowing you to configure alerts, averaging, etc.
 - Read the bus and sense voltages directly as `f32`s
