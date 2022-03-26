@@ -129,13 +129,30 @@ macro_rules! read_write_n {
     };
 }
 
+fn vbus_to_real(raw: u16, fsr: VBusFSR) -> f32 {
+    9.0 * match fsr {
+        VBusFSR::Unipolar => (raw as f32) / 65536.0,
+        VBusFSR::BipolarHV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 65536.0,
+        VBusFSR::BipolarLV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 32768.0,
+    }
+}
+
+fn vsense_to_real(raw: u16, fsr: VSenseFSR) -> f32 {
+    0.1 * match fsr {
+        VSenseFSR::Unipolar => (raw as f32) / 65536.0,
+        VSenseFSR::BipolarHV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 65536.0,
+        VSenseFSR::BipolarLV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 32768.0,
+    }
+}
+
 impl<E, I> PAC194X<I>
 where
     I: i2c::Read<Error = E> + i2c::Write<Error = E> + i2c::WriteRead<Error = E>,
 {
     /// Initializes the driver.
     ///
-    /// This consumes the I2C bus `I`. To use this driver with other I2C crates, check out [shared-bus](https://github.com/Rahix/shared-bus)
+    /// This consumes the I2C bus `I`.
+    /// To use this driver with other I2C crates, check out [shared-bus](https://github.com/Rahix/shared-bus)
     pub fn new(i2c: I, addr_sel: AddrSelect) -> Self {
         Self {
             i2c,
@@ -236,6 +253,63 @@ where
     pub fn revision_id(&mut self) -> Result<u8, Error<E>> {
         self.send_byte(regs::Address::RevisionId)?;
         self.receive_byte()
+    }
+
+    /// High level API for retrieving the bus voltage of channel `n`
+    pub fn read_bus_voltage_n(&mut self, n: u8) -> Result<f32, Error<E>> {
+        assert!((1..=4).contains(&n), "Channel n must be between 1 and 4");
+        let fsr_reg = self.read_neg_pwr_fsr_lat()?;
+        let fsr = match n {
+            1 => fsr_reg.cfg_vb1,
+            2 => fsr_reg.cfg_vb2,
+            3 => fsr_reg.cfg_vb3,
+            4 => fsr_reg.cfg_vb4,
+            _ => unreachable!(),
+        };
+        Ok(vbus_to_real(self.read_vbusn(n)?.voltage, fsr))
+    }
+
+    /// High level API for retrieving the sense voltage of channel `n`
+    /// Use Ohm's law with your sense resistor value (V/R) to get the sense current
+    pub fn read_sense_voltage_n(&mut self, n: u8) -> Result<f32, Error<E>> {
+        assert!((1..=4).contains(&n), "Channel n must be between 1 and 4");
+        let fsr_reg = self.read_neg_pwr_fsr_lat()?;
+        let fsr = match n {
+            1 => fsr_reg.cfg_vs1,
+            2 => fsr_reg.cfg_vs2,
+            3 => fsr_reg.cfg_vs3,
+            4 => fsr_reg.cfg_vs4,
+            _ => unreachable!(),
+        };
+        Ok(vsense_to_real(self.read_vsensen(n)?.voltage, fsr))
+    }
+
+    /// Same as [`read_bus_voltage_n`], but using the accumulator-based rolling average
+    pub fn read_avg_bus_voltage_n(&mut self, n: u8) -> Result<f32, Error<E>> {
+        assert!((1..=4).contains(&n), "Channel n must be between 1 and 4");
+        let fsr_reg = self.read_neg_pwr_fsr_lat()?;
+        let fsr = match n {
+            1 => fsr_reg.cfg_vb1,
+            2 => fsr_reg.cfg_vb2,
+            3 => fsr_reg.cfg_vb3,
+            4 => fsr_reg.cfg_vb4,
+            _ => unreachable!(),
+        };
+        Ok(vbus_to_real(self.read_vbusn_avg(n)?.voltage, fsr))
+    }
+
+    /// Same as [`read_bus_voltage_n`], but using the accumulator-based rolling average
+    pub fn read_avg_sense_voltage_n(&mut self, n: u8) -> Result<f32, Error<E>> {
+        assert!((1..=4).contains(&n), "Channel n must be between 1 and 4");
+        let fsr_reg = self.read_neg_pwr_fsr_lat()?;
+        let fsr = match n {
+            1 => fsr_reg.cfg_vs1,
+            2 => fsr_reg.cfg_vs2,
+            3 => fsr_reg.cfg_vs3,
+            4 => fsr_reg.cfg_vs4,
+            _ => unreachable!(),
+        };
+        Ok(vsense_to_real(self.read_vsensen(n)?.voltage, fsr))
     }
 
     // Auto generated functions for reading and writing all of our registers
