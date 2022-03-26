@@ -28,7 +28,7 @@ fn main() {
         let bus_voltage_1 = sensor.read_bus_voltage_n(1).unwrap();
         let sense_voltage_1 = sensor.read_sense_voltage_n(1).unwrap();
         println!("Channel 1 has a bus voltage of: {:.2} V", bus_voltage_1);
-        println!("Channel 1 is pulling a currnt of: {:.2} A", sense_voltage_1 / SENSE_RESISTOR);
+        println!("Channel 1 is pulling a current of: {:.2} A", sense_voltage_1 / SENSE_RESISTOR);
     }
 }
 ```
