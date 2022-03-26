@@ -50,7 +50,7 @@ pub enum Error<E> {
 }
 
 macro_rules! read_fn {
-    ($var:ident, $type:ty) => {
+    ($var:ident: $type:ty) => {
         paste! {
             #[doc = stringify!(Reads the $type register and deserializes into the appropriate struct)]
             pub fn [<read_ $var>](&mut self) -> Result<$type, Error<E>> {
@@ -61,7 +61,7 @@ macro_rules! read_fn {
 }
 
 macro_rules! read_n_fn {
-    ($var:ident, $type:ty) => {
+    ($var:ident: $type:ty) => {
         paste! {
             #[doc = stringify!(Reads the $type register and deserializes into the appropriate struct)]
             pub fn [<read_ $var>](&mut self, n: u8) -> Result<$type, Error<E>> {
@@ -73,7 +73,7 @@ macro_rules! read_n_fn {
 }
 
 macro_rules! write_fn {
-    ($var:ident,$type:ty) => {
+    ($var:ident: $type:ty) => {
         paste! {
             #[doc = stringify!(Writes out the $type register)]
             pub fn [<write_ $var>](&mut self, $var: $type) -> Result<(), Error<E>> {
@@ -89,9 +89,9 @@ macro_rules! write_fn {
 }
 
 macro_rules! read_write {
-    ($var:ident,$type:ty) => {
-        write_fn!($var, $type);
-        read_fn!($var, $type);
+    ($var:ident: $type:ty) => {
+        write_fn!($var: $type);
+        read_fn!($var: $type);
     };
 }
 
@@ -168,13 +168,22 @@ where
     }
 
     // Auto generated functions for reading and writing all of our registers
-    read_write!(ctrl, Ctrl);
-    read_write!(acc_count, AccCount);
-    read_n_fn!(vaccn, Vaccn);
-    read_n_fn!(vbusn, Vbusn);
-    read_n_fn!(vsensen, Vsensen);
-    read_n_fn!(vbusn_avg, VbusnAvg);
-    read_n_fn!(vsensen_avg, VsensenAvg);
+    read_write!(ctrl: Ctrl);
+    read_write!(acc_count: AccCount);
+    read_n_fn!(vaccn: Vaccn);
+    read_n_fn!(vbusn: Vbusn);
+    read_n_fn!(vsensen: Vsensen);
+    read_n_fn!(vbusn_avg: VbusnAvg);
+    read_n_fn!(vsensen_avg: VsensenAvg);
+    read_n_fn!(vpowern: Vpowern);
+    read_write!(smub_settings: SmbusSettings);
+    read_write!(neg_pwr_fsr: NegPwrFsr);
+    read_fn!(slow: Slow);
+    read_fn!(ctrl_act: CtrlAct);
+    read_write!(neg_pwr_fsr_act: NegPwrFsrAct);
+    read_fn!(ctrl_lat: CtrlLat);
+    read_write!(neg_pwr_fsr_lat: NegPwrFsrLat);
+    read_write!(accum_config: AccumConfig);
 }
 
 #[cfg(test)]
@@ -186,4 +195,3 @@ mod tests {
         assert_eq!(Address::RevisionId as u8, 0xFF);
     }
 }
-
