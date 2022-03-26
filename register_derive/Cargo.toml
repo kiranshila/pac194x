@@ -6,6 +6,8 @@ edition = "2021"
 repository = "https://github.com/kiranshila/pac194x"
 readme = "../README.md"
 documentation = "https://docs.rs/crate/pac194x/"
+license = "MIT OR Apache-2.0"
+description = "Helper proc macro for the pac194x crate"
 
 [lib]
 proc_macro = true
