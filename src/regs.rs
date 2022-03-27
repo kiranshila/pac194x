@@ -1,3 +1,5 @@
+//! Contains the registers and associated types for the PAC194X
+
 use packed_struct::prelude::*;
 use register_derive::Register;
 
@@ -78,8 +80,9 @@ pub enum SampleMode {
     Sleep = 0b1111,
 }
 
-/// Pin mode for GPIO/ALERT2 and SLOW/ALERT1
+
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
+/// Pin mode for GPIO/ALERT2 and SLOW/ALERT1
 pub enum GpioAlert {
     Alert,
     Input,
@@ -89,6 +92,7 @@ pub enum GpioAlert {
 
 #[derive(PackedStruct, Default, Debug, PartialEq)]
 #[packed_struct(bit_numbering = "msb0")]
+/// Channels to be potentially disabled
 pub struct Channels {
     #[packed_field(bits = "4")]
     pub _1: bool,
@@ -99,23 +103,24 @@ pub struct Channels {
 
 #[derive(PackedStruct, Debug, PartialEq, Register)]
 #[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
+/// Primary control registeer
 pub struct Ctrl {
     #[packed_field(bits = "15:12", ty = "enum")]
     pub sample_mode: SampleMode,
     #[packed_field(bits = "11:10", ty = "enum")]
     /// Select the signals for the GPIO/ALERT2 pin. If the pin is configured as a GPIO
-    /// pin, the R/W data for the pin are stored in `SMBusSettings`.
+    /// pin, the R/W data for the pin are stored in [`SmbusSettings`].
     pub gpio_alert2: GpioAlert,
     #[packed_field(bits = "9:8", ty = "enum")]
     /// Select the signals for SLOW/ALERT1 pin. If the pin is configured as a GPIO
-    /// pin, the R/W data for the pin are stored in `SMBusSettings`
+    /// pin, the R/W data for the pin are stored in [`SmbusSettings`]
     pub slow_alert1: GpioAlert,
     #[packed_field(bits = "7:4")]
     /// Allow one or more channels to be disabled (bit value = 1) during the conversion cycle. A bit value = 0
     /// means the channel is active. These settings apply for normal continuous round robin conversion
     /// cycles or Single-Shot mode, if Single-Shot mode is selected. If a channel is set to inactive, the
     /// auto-incrementing address pointer will skip addresses associated with that channel unless the No Skip
-    /// bit 1 in Register `SMBusSettings` is set.
+    /// bit 1 in Register [`SmbusSettings`] is set.
     pub channel_n_off: Channels,
 }
 
@@ -132,7 +137,7 @@ pub struct AccCount {
 #[packed_struct(size_bytes = "7", bit_numbering = "lsb0")]
 /// This register contains the accumulated sum of V POWER samples, where n = 1 to 4,
 /// depending on the device by default. It can also hold the accumulated values of V SENSE and VBUS if
-/// bits are set in Register 7-19. These are 56-bit unsigned numbers, unless either VBUS or VSENSE is con-
+/// bits are set in [`AccumConfig`]. These are 56-bit unsigned numbers, unless either VBUS or VSENSE is con-
 /// figured to have a bipolar range. In that case, they will be 55 bits + sign (two’s complement) numbers.
 /// Power is always calculated using signed numbers for V BUS and VSENSE, but if both VBUS and VSENSE
 /// are in the default Unipolar mode, power is reported as an unsigned number. This can lead to very small
@@ -266,6 +271,7 @@ pub struct SmbusSettings {
 }
 
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
+/// Full scale range (FSR) for the sense voltage
 pub enum VSenseFSR {
     /// Unipolar range of +100 mV to 0V FSR
     Unipolar = 0,
@@ -276,6 +282,7 @@ pub enum VSenseFSR {
 }
 
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
+/// Full scale range (FSR) for the bus voltage
 pub enum VBusFSR {
     /// Unipolar range of +9 V to 0V FSR
     Unipolar = 0,
@@ -371,18 +378,18 @@ pub struct CtrlAct {
     pub sample_mode: SampleMode,
     #[packed_field(bits = "11:10", ty = "enum")]
     /// Select the signals for the GPIO/ALERT2 pin. If the pin is configured as a GPIO
-    /// pin, the R/W data for the pin are stored in `SMBusSettings`.
+    /// pin, the R/W data for the pin are stored in [`SmbusSettings`].
     pub gpio_alert2: GpioAlert,
     #[packed_field(bits = "9:8", ty = "enum")]
     /// Select the signals for SLOW/ALERT1 pin. If the pin is configured as a GPIO
-    /// pin, the R/W data for the pin are stored in `SMBusSettings`
+    /// pin, the R/W data for the pin are stored in [`SmbusSettings`]
     pub slow_alert1: GpioAlert,
     #[packed_field(bits = "7:4")]
     /// Allow one or more channels to be disabled (bit value = 1) during the conversion cycle. A bit value = 0
     /// means the channel is active. These settings apply for normal continuous round robin conversion
     /// cycles or Single-Shot mode, if Single-Shot mode is selected. If a channel is set to inactive, the
     /// auto-incrementing address pointer will skip addresses associated with that channel unless the No Skip
-    /// bit 1 in Register [`SMBusSettings`] is set.
+    /// bit 1 in Register [`SmbusSettings`] is set.
     pub channel_n_off: Channels,
 }
 
@@ -425,18 +432,18 @@ pub struct CtrlLat {
     pub sample_mode: SampleMode,
     #[packed_field(bits = "11:10", ty = "enum")]
     /// Select the signals for the GPIO/ALERT2 pin. If the pin is configured as a GPIO
-    /// pin, the R/W data for the pin are stored in [`SMBusSettings`].
+    /// pin, the R/W data for the pin are stored in [`SmbusSettings`].
     pub gpio_alert2: GpioAlert,
     #[packed_field(bits = "9:8", ty = "enum")]
     /// Select the signals for SLOW/ALERT1 pin. If the pin is configured as a GPIO
-    /// pin, the R/W data for the pin are stored in [`SMBusSettings]`
+    /// pin, the R/W data for the pin are stored in [`SmbusSettings`]
     pub slow_alert1: GpioAlert,
     #[packed_field(bits = "7:4")]
     /// Allow one or more channels to be disabled (bit value = 1) during the conversion cycle. A bit value = 0
     /// means the channel is active. These settings apply for normal continuous round robin conversion
     /// cycles or Single-Shot mode, if Single-Shot mode is selected. If a channel is set to inactive, the
     /// auto-incrementing address pointer will skip addresses associated with that channel unless the No Skip
-    /// bit 1 in Register [`SMBusSettings`] is set.
+    /// bit 1 in Register [`SmbusSettings`] is set.
     pub channel_n_off: Channels,
 }
 
@@ -646,7 +653,7 @@ pub enum AccFullness {
 #[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
 /// These limits are used to set a limit for how full the Accumulators and Accumulator Count registers can be before the
 /// Accumulator Full and Accumulator Count full limits are tripped. This allows an ALERT to be registered when the
-/// Accumulator and Accumulator Count are approaching 100% full. Disable ALERTs in Register 7-34 before changing
+/// Accumulator and Accumulator Count are approaching 100% full. Disable ALERTs in [`AlertEnable`] before changing
 /// the value to avoid false triggers.
 pub struct AccFullnessLimits {
     #[packed_field(bits = "15:14", ty = "enum")]

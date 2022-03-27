@@ -310,7 +310,7 @@ where
         Ok(vsense_to_real(self.read_vsensen(n)?.voltage, fsr))
     }
 
-    /// Same as [`read_bus_voltage_n`], but using the accumulator-based rolling average
+    /// Same as [read_bus_voltage_n()], but using the accumulator-based rolling average
     pub fn read_avg_bus_voltage_n(&mut self, n: u8) -> Result<f32, Error<E>> {
         assert!((1..=4).contains(&n), "Channel n must be between 1 and 4");
         let fsr_reg = self.read_neg_pwr_fsr_lat()?;
@@ -324,7 +324,7 @@ where
         Ok(vbus_to_real(self.read_vbusn_avg(n)?.voltage, fsr))
     }
 
-    /// Same as [`read_bus_voltage_n`], but using the accumulator-based rolling average
+    /// Same as [read_sense_voltage_n()], but using the accumulator-based rolling average
     pub fn read_avg_sense_voltage_n(&mut self, n: u8) -> Result<f32, Error<E>> {
         assert!((1..=4).contains(&n), "Channel n must be between 1 and 4");
         let fsr_reg = self.read_neg_pwr_fsr_lat()?;
