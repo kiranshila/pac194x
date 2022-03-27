@@ -80,7 +80,6 @@ pub enum SampleMode {
     Sleep = 0b1111,
 }
 
-
 #[derive(PrimitiveEnum_u8, Clone, Copy, Debug, PartialEq)]
 /// Pin mode for GPIO/ALERT2 and SLOW/ALERT1
 pub enum GpioAlert {
