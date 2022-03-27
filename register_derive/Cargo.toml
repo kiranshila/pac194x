@@ -1,6 +1,6 @@
 [package]
 name = "register_derive"
-version = "0.1.0"
+version = "0.1.1"
 authors = [ "Kiran Shila <me@kiranshila.com>" ]
 edition = "2021"
 repository = "https://github.com/kiranshila/pac194x"
@@ -16,6 +16,3 @@ proc_macro = true
 syn = { version = "1.0", features = ["full", "extra-traits"] }
 quote = "1.0"
 proc-macro2 = "1.0"
-
-[package.metadata.workspaces]
-independent = true
