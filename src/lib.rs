@@ -34,6 +34,7 @@ use paste::paste;
 use regs::*;
 
 #[repr(u8)]
+#[derive(Debug, Copy, Clone)]
 /// Address select resistor value.
 ///
 /// `GND` is a zero-ohm resistor where `ADDRSEL` is connected to ground.
@@ -58,6 +59,7 @@ pub enum AddrSelect {
 }
 
 /// The Product ID of the connected part
+#[derive(Debug, Copy, Clone)]
 pub enum ProductId {
     PAC1941_1,
     PAC1942_1,
