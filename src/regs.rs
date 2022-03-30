@@ -128,7 +128,7 @@ pub struct Ctrl {
 /// This register contains the count for each time a power result is summed in the
 /// accumulator.
 pub struct AccCount {
-    #[packed_field(bits = "31:0", endian = "lsb")]
+    #[packed_field(bits = "31:0", endian = "msb")]
     pub count: u32,
 }
 
@@ -146,45 +146,45 @@ pub struct AccCount {
 /// will in some cases have a more accurate number than calculations using the results registers for
 /// VSENSE and V POWER will provide.
 pub struct Vaccn {
-    #[packed_field(bits = "55:0", endian = "lsb")]
+    #[packed_field(bits = "55:0", endian = "msb")]
     pub sum: u64,
 }
 
 #[derive(PackedStruct, Debug, PartialEq, Register)]
-#[packed_struct(size_bytes = "7", bit_numbering = "lsb0")]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
 ///  This register contains the most recent digitized value of a VBUS sample, where n = 1 to
 /// 4, depending on the device. These are 16-bit unsigned numbers, unless VBUS is configured to have a
 /// bipolar range. In that case, they will be 15 bits + sign (two’s complement) numbers.
 pub struct Vbusn {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub voltage: u16,
 }
 
 #[derive(PackedStruct, Debug, PartialEq, Register)]
-#[packed_struct(size_bytes = "7", bit_numbering = "lsb0")]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
 /// This register contains the most recent digitized value of V SENSE samples, where n
 /// = 1 to 4, depending on the device. These are 16-bit unsigned numbers, unless V SENSE is configured
 /// to have a bipolar range. In that case, they will be 15 bits + sign (two’s complement) numbers
 pub struct Vsensen {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub voltage: u16,
 }
 
 #[derive(PackedStruct, Debug, PartialEq, Register)]
-#[packed_struct(size_bytes = "7", bit_numbering = "lsb0")]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
 /// This register contain a rolling average of the eight most recent V BUS
 /// measurements. It has the same format as the values in the VBUS registers.
 pub struct VbusnAvg {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub voltage: u16,
 }
 
 #[derive(PackedStruct, Debug, PartialEq, Register)]
-#[packed_struct(size_bytes = "7", bit_numbering = "lsb0")]
+#[packed_struct(size_bytes = "2", bit_numbering = "lsb0")]
 /// This register contain a rolling average of the eight most recent V SENSE
 /// measurements. It has the same format as the values in the V SENSE registers.
 pub struct VsensenAvg {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub voltage: u16,
 }
 
@@ -202,7 +202,7 @@ pub struct VsensenAvg {
 /// a more accurate number than calculations using the results registers for V SENSE and V POWER will
 /// provide.
 pub struct Vpowern {
-    #[packed_field(bits = "31:2", endian = "lsb")]
+    #[packed_field(bits = "31:2", endian = "msb")]
     pub power: u32,
 }
 
@@ -673,7 +673,7 @@ pub struct AccFullnessLimits {
 /// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
 /// channel has its own limit and addressable register.
 pub struct OcLimitn {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub limit: i16,
 }
 
@@ -683,7 +683,7 @@ pub struct OcLimitn {
 /// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
 /// channel has its own limit and addressable register.
 pub struct UcLimitn {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub limit: i16,
 }
 
@@ -695,7 +695,7 @@ pub struct UcLimitn {
 /// limit. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each channel
 /// has its own limit and addressable register.
 pub struct OpLimitn {
-    #[packed_field(bits = "23:0", endian = "lsb")]
+    #[packed_field(bits = "23:0", endian = "msb")]
     pub limit: i32,
 }
 
@@ -705,7 +705,7 @@ pub struct OpLimitn {
 /// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
 /// channel has its own limit and addressable register.
 pub struct OvLimitn {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub limit: i16,
 }
 
@@ -715,7 +715,7 @@ pub struct OvLimitn {
 /// all modes. Disable ALERTs in [`AlertEnable`] before changing the value to avoid false triggers. Each
 /// channel has its own limit and addressable register.
 pub struct UvLimitn {
-    #[packed_field(bits = "15:0", endian = "lsb")]
+    #[packed_field(bits = "15:0", endian = "msb")]
     pub limit: i16,
 }
 
