@@ -37,6 +37,9 @@ fn main() {
 }
 ```
 
+## Discussion
+
+I wrote a blog post about the development of this crate [here](https://blog.kiranshila.com/blog/pac_rust_driver.md)
 
 ## License
 Licensed under either of
