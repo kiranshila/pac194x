@@ -17,25 +17,10 @@ This driver allows you to:
 ## Usage
 
 To use this driver, import this crate and an `embedded_hal` implementation,
-then instantiate the appropriate device.
+then instantiate the appropriate device. See the `examples` folder for example code.
 
-```rust
-use linux_embedded_hal::I2cdev;
-use pac194x::{PAC194X, AddrSelect};
-
-const SENSE_RESISTOR: f32 = 0.5;
-
-fn main() {
-    let i2c = I2cdev::new("/dev/i2c-1").unwrap();
-    let mut sensor = PAC194X::new(i2c, AddrSelect::GND).unwrap();
-    loop {
-        let bus_voltage_1 = sensor.read_bus_voltage_n(1).unwrap();
-        let sense_voltage_1 = sensor.read_sense_voltage_n(1).unwrap();
-        println!("Channel 1 has a bus voltage of: {:.2} V", bus_voltage_1);
-        println!("Channel 1 is pulling a current of: {:.2} A", sense_voltage_1 / SENSE_RESISTOR);
-    }
-}
-```
+Run it on Linux with `cargo build --examples linux && sudo ./target/debug/examples/linux`.
+It's hardcoded to bus `/dev/i2c-3` and I2C address 0b10000 (grounded).
 
 ## Discussion
 
