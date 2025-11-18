@@ -15,6 +15,10 @@ documentation = "https://docs.rs/crate/pac194x/"
 embedded-hal = "0.2"
 paste = "1.0"
 
+# For the example
+[dev-dependencies]
+linux-embedded-hal = "0.3.2"
+
 [dependencies.packed_struct]
 version = "0.10"
 default-features = false

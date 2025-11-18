@@ -1,9 +1,7 @@
-name: Main
+name: CI Build
 
 on:
   push:
-    branches:
-      - "main"
 
 env:
   CARGO_TERM_COLOR: always
@@ -20,30 +18,24 @@ jobs:
           - nightly
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
-        name: installing toolchain
-        with:
-          profile: default
-          toolchain: ${{ matrix.rust }}
-          override: true
-          components: rustfmt, clippy
+      - name: Set up Rust toolchain
+        run: |
+          rustup toolchain install ${{ matrix.rust }}
 
-      - uses: actions-rs/cargo@v1
-        name: build
-        with:
-          command: build
-          args: --release
+      - name: Build examples
+        run: |
+          cargo build --examples
 
-      - uses: actions-rs/cargo@v1
-        name: fmt
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: Build release config
+        run: |
+          cargo build --release
 
-      - uses: actions-rs/cargo@v1
-        name: clippy
-        with:
-          command: clippy
-          args: -- -D warnings
+      - name: Check formatting
+        run: |
+          cargo fmt --all -- --check
+
+      - name: Check formatting
+        run: |
+          cargo clippy -- -D warnings

@@ -261,6 +261,7 @@ pub struct SmbusSettings {
     ///
     /// - false = The auto-incrementing pointer will skip over addresses used by/for channels that are inactive (default)
     /// - true = he auto-incrementing pointer will not skip over addresses used by/for channels that are inactive.
+    ///
     /// When these channels are disabled, if a read is performed, it will read FF.
     pub no_skip: bool,
     #[packed_field(bits = "0")]
@@ -334,31 +335,37 @@ pub struct Slow {
     #[packed_field(bits = "6")]
     /// - false = The SLOW pin has not transitioned low to high since the last REFRESH command
     /// - true = The SLOW pin has transitioned low to high since the last REFRESH command
+    ///
     /// The bit is reset to ‘0’ by a REFRESH or REFRESH_G command.
     pub slow_lh: bool,
     #[packed_field(bits = "5")]
     /// - false = The SLOW pin has not transitioned low to high since the last REFRESH command
     /// - true = The SLOW pin has transitioned low to high since the last REFRESH command
+    ///
     /// The bit is reset to ‘0’ by a REFRESH or REFRESH_G command.
     pub slow_hl: bool,
     #[packed_field(bits = "4")]
     /// - false = Disables limited REFRESH function to take place on the rising edge of the SLOW pin
     /// - true = Enables limited REFRESH function to take place on the rising edge of the SLOW pin
+    ///
     /// The bit is not reset automatically, it must be written to be changed.
     pub r_rise: bool,
     #[packed_field(bits = "3")]
     /// - false = Disables limited REFRESH_V function to take place on the rising edge of the SLOW pin
     /// - true = Enables limited REFRESH_V function to take place on the rising edge of the SLOW pin
+    ///
     /// The bit is not reset automatically, it must be written to be changed.
     pub r_v_rise: bool,
     #[packed_field(bits = "2")]
     /// - false = Disables limited REFRESH function to take place on the rising edge of the SLOW pin
     /// - true = Enables limited REFRESH function to take place on the rising edge of the SLOW pin
+    ///
     /// The bit is not reset automatically, it must be written to be changed.
     pub r_fall: bool,
     #[packed_field(bits = "1")]
     /// - false = Disables limited REFRESH_V function to take place on the rising edge of the SLOW pin
     /// - true = Enables limited REFRESH_V function to take place on the rising edge of the SLOW pin
+    ///
     /// The bit is not reset automatically, it must be written to be changed.
     pub r_v_fall: bool,
 }
