@@ -67,6 +67,12 @@ pub enum ProductId {
     PAC1944_1,
     PAC1941_2,
     PAC1942_2,
+    PAC1951_1,
+    PAC1952_1,
+    PAC1953_1,
+    PAC1954_1,
+    PAC1951_2,
+    PAC1952_2,
 }
 
 /// A PAC194X power monitor on the I2C bus `I`.
@@ -265,6 +271,12 @@ where
             0b0110_1011 => ProductId::PAC1944_1,
             0b0110_1100 => ProductId::PAC1941_2,
             0b0110_1101 => ProductId::PAC1942_2,
+            0b0111_1000 => ProductId::PAC1951_1,
+            0b0111_1001 => ProductId::PAC1952_1,
+            0b0111_1010 => ProductId::PAC1953_1,
+            0b0111_1011 => ProductId::PAC1954_1,
+            0b0111_1100 => ProductId::PAC1951_2,
+            0b0111_1101 => ProductId::PAC1952_2,
             _ => unreachable!(),
         })
     }
@@ -277,7 +289,7 @@ where
     }
 
     /// The Revision register identifies the die revision.
-    /// This should return 0b00000010
+    /// This should return 0b00000010 for PAC194X and PAC195X
     pub fn revision_id(&mut self) -> Result<u8, Error<E>> {
         self.send_byte(regs::Address::RevisionId)?;
         self.receive_byte()
