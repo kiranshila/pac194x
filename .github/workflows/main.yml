@@ -1,9 +1,7 @@
-name: Main
+name: CI Build
 
 on:
   push:
-    branches:
-      - "main"
 
 env:
   CARGO_TERM_COLOR: always
