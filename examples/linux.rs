@@ -6,7 +6,7 @@ const SENSE_RESISTOR: f32 = 0.5;
 
 fn main() {
     let i2c = I2cdev::new("/dev/i2c-3").unwrap();
-    let mut sensor = PAC194X::new(i2c, AddrSelect::GND);
+    let mut sensor = PAC194X::new(i2c, AddrSelect::GND).unwrap();
     loop {
         for channel in 1..5 {
             let bus_voltage = sensor.read_bus_voltage_n(channel).unwrap();

@@ -67,6 +67,31 @@ pub enum ProductId {
     PAC1944_1,
     PAC1941_2,
     PAC1942_2,
+    PAC1951_1,
+    PAC1952_1,
+    PAC1953_1,
+    PAC1954_1,
+    PAC1951_2,
+    PAC1952_2,
+}
+
+impl ProductId {
+    fn max_voltage(&self) -> f32 {
+        match self {
+            Self::PAC1941_1 => 9.0,
+            Self::PAC1942_1 => 9.0,
+            Self::PAC1943_1 => 9.0,
+            Self::PAC1944_1 => 9.0,
+            Self::PAC1941_2 => 9.0,
+            Self::PAC1942_2 => 9.0,
+            Self::PAC1951_1 => 32.0,
+            Self::PAC1952_1 => 32.0,
+            Self::PAC1953_1 => 32.0,
+            Self::PAC1954_1 => 32.0,
+            Self::PAC1951_2 => 32.0,
+            Self::PAC1952_2 => 32.0,
+        }
+    }
 }
 
 /// A PAC194X power monitor on the I2C bus `I`.
@@ -76,6 +101,7 @@ where
 {
     i2c: I,
     address: u8,
+    product_id: ProductId,
 }
 
 /// Driver errors.
@@ -157,8 +183,8 @@ macro_rules! read_write_n {
     };
 }
 
-fn vbus_to_real(raw: u16, fsr: VBusFSR) -> f32 {
-    9.0 * match fsr {
+fn vbus_to_real(raw: u16, max: f32, fsr: VBusFSR) -> f32 {
+    max * match fsr {
         VBusFSR::Unipolar => (raw as f32) / 65536.0,
         VBusFSR::BipolarHV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 65536.0,
         VBusFSR::BipolarLV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 32768.0,
@@ -181,11 +207,15 @@ where
     ///
     /// This consumes the I2C bus `I`.
     /// To use this driver with other I2C crates, check out [shared-bus](https://github.com/Rahix/shared-bus)
-    pub fn new(i2c: I, addr_sel: AddrSelect) -> Self {
-        Self {
+    pub fn new(i2c: I, addr_sel: AddrSelect) -> Result<Self, Error<E>> {
+        let mut s = Self {
             i2c,
             address: addr_sel as u8,
-        }
+            // Default
+            product_id: ProductId::PAC1941_1,
+        };
+        s.product_id = s.product_id()?;
+        Ok(s)
     }
 
     /// The send byte protocol is used to set the internal address register pointer to the correct address
@@ -265,6 +295,12 @@ where
             0b0110_1011 => ProductId::PAC1944_1,
             0b0110_1100 => ProductId::PAC1941_2,
             0b0110_1101 => ProductId::PAC1942_2,
+            0b0111_1000 => ProductId::PAC1951_1,
+            0b0111_1001 => ProductId::PAC1952_1,
+            0b0111_1010 => ProductId::PAC1953_1,
+            0b0111_1011 => ProductId::PAC1954_1,
+            0b0111_1100 => ProductId::PAC1951_2,
+            0b0111_1101 => ProductId::PAC1952_2,
             _ => unreachable!(),
         })
     }
@@ -277,7 +313,7 @@ where
     }
 
     /// The Revision register identifies the die revision.
-    /// This should return 0b00000010
+    /// This should return 0b00000010 for PAC194X and PAC195X
     pub fn revision_id(&mut self) -> Result<u8, Error<E>> {
         self.send_byte(regs::Address::RevisionId)?;
         self.receive_byte()
@@ -294,7 +330,11 @@ where
             4 => fsr_reg.cfg_vb4,
             _ => unreachable!(),
         };
-        Ok(vbus_to_real(self.read_vbusn(n)?.voltage, fsr))
+        Ok(vbus_to_real(
+            self.read_vbusn(n)?.voltage,
+            self.product_id.max_voltage(),
+            fsr,
+        ))
     }
 
     /// High level API for retrieving the sense voltage of channel `n`
@@ -323,7 +363,11 @@ where
             4 => fsr_reg.cfg_vb4,
             _ => unreachable!(),
         };
-        Ok(vbus_to_real(self.read_vbusn_avg(n)?.voltage, fsr))
+        Ok(vbus_to_real(
+            self.read_vbusn_avg(n)?.voltage,
+            self.product_id.max_voltage(),
+            fsr,
+        ))
     }
 
     /// Same as [read_sense_voltage_n()], but using the accumulator-based rolling average
