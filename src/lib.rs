@@ -75,6 +75,25 @@ pub enum ProductId {
     PAC1952_2,
 }
 
+impl ProductId {
+    fn max_voltage(&self) -> f32 {
+        match self {
+            Self::PAC1941_1 => 9.0,
+            Self::PAC1942_1 => 9.0,
+            Self::PAC1943_1 => 9.0,
+            Self::PAC1944_1 => 9.0,
+            Self::PAC1941_2 => 9.0,
+            Self::PAC1942_2 => 9.0,
+            Self::PAC1951_1 => 32.0,
+            Self::PAC1952_1 => 32.0,
+            Self::PAC1953_1 => 32.0,
+            Self::PAC1954_1 => 32.0,
+            Self::PAC1951_2 => 32.0,
+            Self::PAC1952_2 => 32.0,
+        }
+    }
+}
+
 /// A PAC194X power monitor on the I2C bus `I`.
 pub struct PAC194X<I>
 where
@@ -164,8 +183,8 @@ macro_rules! read_write_n {
     };
 }
 
-fn vbus_to_real(raw: u16, fsr: VBusFSR) -> f32 {
-    9.0 * match fsr {
+fn vbus_to_real(raw: u16, max: f32, fsr: VBusFSR) -> f32 {
+    max * match fsr {
         VBusFSR::Unipolar => (raw as f32) / 65536.0,
         VBusFSR::BipolarHV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 65536.0,
         VBusFSR::BipolarLV => (i16::from_ne_bytes(raw.to_le_bytes()) as f32) / 32768.0,
@@ -311,7 +330,11 @@ where
             4 => fsr_reg.cfg_vb4,
             _ => unreachable!(),
         };
-        Ok(vbus_to_real(self.read_vbusn(n)?.voltage, fsr))
+        Ok(vbus_to_real(
+            self.read_vbusn(n)?.voltage,
+            self.product_id.max_voltage(),
+            fsr,
+        ))
     }
 
     /// High level API for retrieving the sense voltage of channel `n`
@@ -340,7 +363,11 @@ where
             4 => fsr_reg.cfg_vb4,
             _ => unreachable!(),
         };
-        Ok(vbus_to_real(self.read_vbusn_avg(n)?.voltage, fsr))
+        Ok(vbus_to_real(
+            self.read_vbusn_avg(n)?.voltage,
+            self.product_id.max_voltage(),
+            fsr,
+        ))
     }
 
     /// Same as [read_sense_voltage_n()], but using the accumulator-based rolling average
