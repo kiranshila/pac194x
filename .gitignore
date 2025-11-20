@@ -1,3 +1,4 @@
 target/
 register_derive/target
 Cargo.lock
+.direnv
