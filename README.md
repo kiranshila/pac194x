@@ -1,6 +1,6 @@
 # Rust PAC194X Power Monitor Driver
 
-A platform-agnostic driver crate for the Microchip [PAC194X](https://ww1.microchip.com/downloads/en/DeviceDoc/PAC194X-Data-Sheet-20006543.pdf) single/multi channel power monitor using the embedded-hal traits.
+A platform-agnostic driver crate for the Microchip [PAC194X](https://ww1.microchip.com/downloads/en/DeviceDoc/PAC194X-Data-Sheet-20006543.pdf) and [PAC195X](https://www.mouser.com/datasheet/2/268/PAC195X_Family_Data_Sheet_20006539B-2933208.pdf) single/multi channel power monitors using the embedded-hal traits.
 
 [![Build Status](https://github.com/kiranshila/pac194x/workflows/Main/badge.svg)](https://github.com/kiranshila/pac194x/actions)
 [![Docs.rs](https://docs.rs/pac194x/badge.svg)](https://docs.rs/pac194x)
