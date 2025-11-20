@@ -82,6 +82,7 @@ where
 {
     i2c: I,
     address: u8,
+    product_id: ProductId,
 }
 
 /// Driver errors.
@@ -187,11 +188,15 @@ where
     ///
     /// This consumes the I2C bus `I`.
     /// To use this driver with other I2C crates, check out [shared-bus](https://github.com/Rahix/shared-bus)
-    pub fn new(i2c: I, addr_sel: AddrSelect) -> Self {
-        Self {
+    pub fn new(i2c: I, addr_sel: AddrSelect) -> Result<Self, Error<E>> {
+        let mut s = Self {
             i2c,
             address: addr_sel as u8,
-        }
+            // Default
+            product_id: ProductId::PAC1941_1,
+        };
+        s.product_id = s.product_id()?;
+        Ok(s)
     }
 
     /// The send byte protocol is used to set the internal address register pointer to the correct address
