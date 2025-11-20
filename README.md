@@ -1,4 +1,4 @@
-# Rust PAC194X Power Monitor Driver
+# Rust PAC19[4/5]X Power Monitor Driver
 
 A platform-agnostic driver crate for the Microchip [PAC194X](https://ww1.microchip.com/downloads/en/DeviceDoc/PAC194X-Data-Sheet-20006543.pdf) and [PAC195X](https://www.mouser.com/datasheet/2/268/PAC195X_Family_Data_Sheet_20006539B-2933208.pdf) single/multi channel power monitors using the embedded-hal traits.
 
@@ -24,7 +24,7 @@ It's hardcoded to bus `/dev/i2c-3` and I2C address 0b10000 (grounded).
 
 ## Discussion
 
-I wrote a blog post about the development of this crate [here](https://blog.kiranshila.com/blog/pac_rust_driver.md)
+I wrote a blog post about the development of this crate [here](https://blog.kiranshila.com/post/pac_rust_driver)
 
 ## License
 Licensed under either of
