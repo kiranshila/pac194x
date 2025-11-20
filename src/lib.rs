@@ -8,15 +8,13 @@
 //!
 //! const SENSE_RESISTOR: f32 = 0.5;
 //!
-//! fn main() {
-//!     let i2c = I2cdev::new("/dev/i2c-1").unwrap();
-//!     let mut sensor = PAC194X::new(i2c, AddrSelect::GND).unwrap();
-//!     loop {
-//!         let bus_voltage_1 = sensor.read_bus_voltage_n(1).unwrap();
-//!         let sense_voltage_1 = sensor.read_sense_voltage_n(1).unwrap();
-//!         println!("Channel 1 has a bus voltage of: {:.2} V", bus_voltage_1);
-//!         println!("Channel 1 is pulling a current of: {:.2} A", sense_voltage_1 / SENSE_RESISTOR);
-//!     }
+//! let i2c = I2cdev::new("/dev/i2c-1").unwrap();
+//! let mut sensor = PAC194X::new(i2c, AddrSelect::GND).unwrap();
+//! loop {
+//!     let bus_voltage_1 = sensor.read_bus_voltage_n(1).unwrap();
+//!     let sense_voltage_1 = sensor.read_sense_voltage_n(1).unwrap();
+//!     println!("Channel 1 has a bus voltage of: {:.2} V", bus_voltage_1);
+//!     println!("Channel 1 is pulling a current of: {:.2} A", sense_voltage_1 / SENSE_RESISTOR);
 //! }
 //! ```
 //!
@@ -28,9 +26,9 @@
 
 pub mod regs;
 
-use embedded_hal::blocking::i2c;
+use embedded_hal::i2c::I2c;
 use packed_struct::prelude::*;
-use paste::paste;
+use pastey::paste;
 use regs::*;
 
 #[repr(u8)]
@@ -97,7 +95,7 @@ impl ProductId {
 /// A PAC194X power monitor on the I2C bus `I`.
 pub struct PAC194X<I>
 where
-    I: i2c::Read + i2c::Write + i2c::WriteRead,
+    I: I2c,
 {
     i2c: I,
     address: u8,
@@ -201,7 +199,7 @@ fn vsense_to_real(raw: u16, fsr: VSenseFSR) -> f32 {
 
 impl<E, I> PAC194X<I>
 where
-    I: i2c::Read<Error = E> + i2c::Write<Error = E> + i2c::WriteRead<Error = E>,
+    I: I2c<Error = E>,
 {
     /// Initializes the driver.
     ///
