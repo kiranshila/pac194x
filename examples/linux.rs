@@ -20,9 +20,10 @@ fn main() {
         }
         println!();
         println!();
-        sensor.refresh().unwrap();
-        sensor.refresh_v().unwrap();
 
+        sensor.refresh().unwrap();
+        thread::sleep(Duration::from_millis(100));
+        sensor.refresh_v().unwrap();
         thread::sleep(Duration::from_millis(100));
     }
 }
