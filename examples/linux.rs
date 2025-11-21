@@ -2,7 +2,7 @@ use linux_embedded_hal::I2cdev;
 use pac194x::{AddrSelect, PAC194X};
 use std::{thread, time::Duration};
 
-const SENSE_RESISTOR: f32 = 0.5;
+const SENSE_RESISTORS: [f32; 4] = [0.005, 0.010, 0.010, 0.010];
 
 fn main() {
     let i2c = I2cdev::new("/dev/i2c-3").unwrap();
@@ -15,7 +15,7 @@ fn main() {
                 "CH{} {:.2}V, {:.2}A, ",
                 channel,
                 bus_voltage,
-                sense_voltage / SENSE_RESISTOR
+                sense_voltage / SENSE_RESISTORS[(channel - 1) as usize]
             );
         }
         println!();
